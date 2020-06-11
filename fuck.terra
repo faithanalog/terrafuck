@@ -49,7 +49,7 @@ end
 
 function compile_lp(s, i, ptr, mem)
     local qq = {}
-    while i ~= #s do
+    while i <= #s do
         local c = s:sub(i,i)
         i = i + 1
         if c == ">" then
