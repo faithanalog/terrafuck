@@ -48,46 +48,57 @@ function do_loop(body)
 end
 
 function compile_lp(s, i, ptr, mem)
-    qq = escape
-        while i ~= #s do
-            local c = s:sub(i,i)
-            i = i + 1
-            if c == ">" then
-                print("move ptr right")
-                emit(move_ptr_right(ptr))
-            elseif c == "<" then
-                print("move ptr left")
-                emit(move_ptr_left(ptr))
-            elseif c == "+" then
-                print("increment cell")
-                emit(inc_cell(ptr, mem))
-            elseif c == "-" then
-                print("decrement cell")
-                emit(dec_cell(ptr, mem))
-            elseif c == "." then
-                print("output cell")
-                emit(output_cell(ptr, mem))
-            elseif c == "," then
-                print("input cell")
-                emit(input_cell(ptr, mem))
-            elseif c == "[" then
-                print("begin loop")
-                body, s, i = do_loop(compile_lp(s, i, ptr, mem))
-                emit(do_loop(body))
-            elseif c == "]" then
-                print("end loop")
-                break
-            else
-                print("ignore")
+    qq = quote
+        escape
+            while i ~= #s do
+                local c = s:sub(i,i)
+                i = i + 1
+                if c == ">" then
+                    print("move ptr right")
+                    emit(move_ptr_right(ptr))
+                elseif c == "<" then
+                    print("move ptr left")
+                    emit(move_ptr_left(ptr))
+                elseif c == "+" then
+                    print("increment cell")
+                    emit(inc_cell(ptr, mem))
+                elseif c == "-" then
+                    print("decrement cell")
+                    emit(dec_cell(ptr, mem))
+                elseif c == "." then
+                    print("output cell")
+                    emit(output_cell(ptr, mem))
+                elseif c == "," then
+                    print("input cell")
+                    emit(input_cell(ptr, mem))
+                elseif c == "[" then
+                    print("begin loop")
+                    body, s, i = do_loop(compile_lp(s, i, ptr, mem))
+                    emit(do_loop(body))
+                elseif c == "]" then
+                    print("end loop")
+                    break
+                else
+                    print("ignore")
+                end
             end
         end
     end
     return qq, s, i
 end
 
-function compile()
-    f = io.open("hello.bf")
-    s = f:read()
+function compile(ptr, mem)
+    local f = io.open("hello.bf")
+    local s = f:read()
 
     print(s)
+    return compile_lp(s, 1, ptr, mem)
 end
+
+terra main()
+    var ptr : int =  0
+    var mem : int[1024]
+    [ compile(ptr, mem) ]
+end
+
+main()
