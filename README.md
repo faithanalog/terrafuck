@@ -7,7 +7,7 @@ completely unoptimized, but llvm makes it fast somehow
 main thing that would speed stuff up is buffering stdin/stdout
 
 ```
-terra fuck.terra hello.bf
+terra fuck.t hello.bf
 
 ./hello-exe
 ```
