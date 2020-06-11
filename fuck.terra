@@ -1,0 +1,83 @@
+local C = terralib.includecstring [[
+    #include <stdio.h>
+]]
+
+
+function move_ptr_right(ptr)
+    return quote
+        ptr = ptr + 1
+    end
+end
+
+function move_ptr_left()
+    return quote
+        ptr = ptr - 1
+    end
+end
+
+function inc_cell(ptr, mem)
+    return quote
+        mem[ptr] = mem[ptr] + 1
+    end
+end
+
+function dec_cell(ptr, mem)
+    return quote
+        mem[ptr] = mem[ptr] - 1
+    end
+end
+
+function output_cell(ptr, mem)
+    return quote
+        C.printf("%c", mem[ptr])       
+    end
+end
+
+function input_cell(ptr, mem)
+    return quote
+
+    end
+end
+
+function begin_loop()
+    return quote
+        while (mem[ptr] != 0) {
+    end
+end
+
+function end_loop()
+    return quote
+        }
+    end
+end
+
+function compile()
+    f = io.open("hello.bf")
+    s = f:read()
+
+    print(s)
+
+    -- TODO: codegen
+    for i = 1, #s do
+        local c = s:sub(i,i)
+        if c == ">" then
+            print("move ptr right")
+        elseif c == "<" then
+            print("move ptr left")
+        elseif c == "+" then
+            print("increment cell")
+        elseif c == "-" then
+            print("decrement cell")
+        elseif c == "." then
+            print("output cell")
+        elseif c == "," then
+            print("input cell")
+        elseif c == "[" then
+            print("begin loop")
+        elseif c == "]" then
+            print("end loop")
+        else
+            print("ignore")
+        end
+    end
+end
