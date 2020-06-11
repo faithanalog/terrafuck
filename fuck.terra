@@ -9,7 +9,7 @@ function move_ptr_right(ptr)
     end
 end
 
-function move_ptr_left()
+function move_ptr_left(ptr)
     return quote
         ptr = ptr - 1
     end
@@ -39,16 +39,50 @@ function input_cell(ptr, mem)
     end
 end
 
-function begin_loop()
+function do_loop(body)
     return quote
-        while (mem[ptr] != 0) {
+        while mem[ptr] ~= 0 do
+            [ body ]
+        end
     end
 end
 
-function end_loop()
-    return quote
-        }
+function compile_lp(s, i, ptr, mem)
+    qq = escape
+        while i ~= #s do
+            local c = s:sub(i,i)
+            i = i + 1
+            if c == ">" then
+                print("move ptr right")
+                emit(move_ptr_right(ptr))
+            elseif c == "<" then
+                print("move ptr left")
+                emit(move_ptr_left(ptr))
+            elseif c == "+" then
+                print("increment cell")
+                emit(inc_cell(ptr, mem))
+            elseif c == "-" then
+                print("decrement cell")
+                emit(dec_cell(ptr, mem))
+            elseif c == "." then
+                print("output cell")
+                emit(output_cell(ptr, mem))
+            elseif c == "," then
+                print("input cell")
+                emit(input_cell(ptr, mem))
+            elseif c == "[" then
+                print("begin loop")
+                body, s, i = do_loop(compile_lp(s, i, ptr, mem))
+                emit(do_loop(body))
+            elseif c == "]" then
+                print("end loop")
+                break
+            else
+                print("ignore")
+            end
+        end
     end
+    return qq, s, i
 end
 
 function compile()
@@ -56,28 +90,4 @@ function compile()
     s = f:read()
 
     print(s)
-
-    -- TODO: codegen
-    for i = 1, #s do
-        local c = s:sub(i,i)
-        if c == ">" then
-            print("move ptr right")
-        elseif c == "<" then
-            print("move ptr left")
-        elseif c == "+" then
-            print("increment cell")
-        elseif c == "-" then
-            print("decrement cell")
-        elseif c == "." then
-            print("output cell")
-        elseif c == "," then
-            print("input cell")
-        elseif c == "[" then
-            print("begin loop")
-        elseif c == "]" then
-            print("end loop")
-        else
-            print("ignore")
-        end
-    end
 end
